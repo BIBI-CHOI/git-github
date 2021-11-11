@@ -1,0 +1,20 @@
+깃 설치하기
+    1. https://git-scm.com 다운로드
+    2. 설치(기본값)
+    3. 윈도우 작업표시줄 검색 창 'git'입력 [Git Bash]선택
+    4. $ git 입력
+
+깃 환경 설정하기
+    깃을 사용하기 전에 먼저 사용자 정보를 입력한다.
+    깃은 버전을 저장할 때마다 그 버전을 만든 사용자 정보도 함께 저장하기 때문이다.
+
+    명령어
+    git config
+
+    옵션
+    --global : 현재 컴퓨터에 있는 모든 저장소에서 같은 사용자 정보를 사용하도록 설정
+
+    $ git config --global user.name "bitcamp"
+    $ git config --global user.email "call1212@narospace.com"
+    
+     

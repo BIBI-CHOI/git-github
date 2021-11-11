@@ -1,0 +1,192 @@
+
+만들어진 각 브랜치에서 작업을 하다가 어느 시점에서는 브랜치 작업을
+마무리하고 기존 브랜치와 합해야 한다. 이것을 '브랜치 병합(merge)'
+라고 함. 브랜치와 브랜치를 병합하다 보면 여러 상황이 생길 수 있는데
+각 상황마다 병합하는 방법을 알아보자. 그리고 병합하면서 브랜치 사이에
+충돌이 있을 때 해결하는 방법도 함께 살피자.
+
+서로 다른 파일 병합하기
+    1. git init manual-2
+       cd manual-2
+       ls -al
+    2. vi work.txt <--'1' 입력 저장
+       git add work.txt
+       git commit -m 'work 1'
+    3. git branch o2
+        'o2'라는 브랜치 생성
+    4. vi master.txt <--'master 2' 입력 저장
+       git add master.txt
+       git commit -m 'master work 2'
+    5. git checkout o2
+    6. vi o2.txt <--'o2 2' 입력 저장
+       git add o2.txt
+       git commit -m 'o2 work 2'
+    7. git log --oneline --branches --graph
+        * cbfb24f (HEAD -> o2) o2 work 2
+        | * 29b7823 (master) master work 2
+        |/
+        * 516ca0b work 1
+    8. git checkout master
+        o2브랜치에서 작업이 다 끝났다고 가정하고, o2브랜치의 내용을 
+        master블랜치로 병합해 보자. 브랜치를 병합하려면 먼저
+        master브랜치로 체크아웃해야 한다.
+    9. git merge o2
+        브랜치를 병합하려면 merge 명령 뒤에 가져올 브랜치 이름
+    10.자동으로 편집기 실행 'Merge branch o2'라는 커밋 메시지가 표시
+       커밋메시지를 수정할 수도 있고, 그대로 사용해도 된다.
+    11.ls -al
+         o2브랜치에 있던 o2.txt파일이 master브랜치에 합쳐졌음
+    12.git log --oneline --branches --graph
+         *   096002b (HEAD -> master) Merge branch 'o2'
+         |\
+         | * cbfb24f (o2) o2 work 2
+         * | 29b7823 master work 2
+         |/
+         * 516ca0b work 1
+         브랜치와 커밋들의 병합 확인(Merge branch 'o2' 커밋 새로 생성)
+
+         참고| 브랜치 병합 시 편집기 창 제어
+            $ git merge o2 --no-edit
+               편집기 창 열지않고 깃 지정 메시지 사용
+            $ git merge o2 --edit
+               커밋 메시지를 추가하거나 수정하고 싶을 때
+
+같은 문서의 다른 위치를 수정했을 때 병합하기
+   master 브랜치와 o2브랜치에는 똑같이 work.txt파일이 존재
+   양쪽 브랜치에서 work.txt문서를 수정하되 다른 위치를 수정한 후
+   브랜치를 병합했을 때 어떤 결과가 나오는지 확인하자
+   1. git init manual-3
+      cd manual-3
+      ls -al
+   2. vi work.txt
+         # title
+         content
+
+
+         # title
+         content
+         입력 후 저장
+   3. git add work.txt
+      git commit -m 'work 1'
+   4. git branch o2
+   5. vi work.txt
+         # title
+         content
+         master content 2
+         ...
+   6. git commit -am 'master work 2'
+   8. git checkout o2
+      vi work.txt
+         ...
+         # title
+         content
+         o2 content 2
+   9. git commit -am 'o2 work 2'
+   10.git checkout master
+         master브랜치와 o2브랜치 양쪽에서 work.txt 파일을 수정했지만
+         문서 안의 수정 위치는 다르다.
+   11.git merge o2
+         'Auto-merging work.txt'
+   12.cat work.txt
+         # title
+         content
+         master content 2
+
+         # title
+         content
+         o2 content 2
+
+같은 문서의 같은 위치를 수정했을 때 병합하기
+   깃에서는 줄 단위로 변경 여부를 확인, 그래서 각 브랜치에 같은 파일
+   이름을 가지고 있으면서 같은 줄을 수정했을 때 브랜치를 병합하면 
+   브랜치 충돌(conflict)이 발생한다.
+   어떻게 해결해야 할까?
+   1. git init manual-4
+      cd manual-4
+      ls -al
+   2. vi work.txt
+         # title
+         content
+
+         # title
+         content
+   3. git add work.txt
+      git commit -m 'work 1'
+   4. git branch o2
+   5. vi work.txt
+         # title
+         content
+         master content 2
+         ...
+   6. git commit -am 'master work 2'
+   7. git checkout o2
+      vi work.txt
+         # title
+         content
+         o2 content 2 <--- '같은 위치 수정'
+         ...   
+   8. git commit -am 'o2 work 2'
+   9. git checkout master
+         master브랜치와 o2브랜치 양쪽에서 work.txt파일을 수정했는데
+         문서 안의 수정 위치가 같다.
+   10.git merge o2
+         Auto-merging work.txt
+         CONFLICT (content): Merge conflict in work.txt
+         Automatic merge failed; fix conflicts and then commit the result.
+         충돌이 생긴 문서는 자동으로 병합될 수 없으므로 사용자가 직접 충돌
+         부분을 해결한 후 커밋해야 한다.
+   11.vi work.txt
+         # title
+         content
+         <<<<<<< HEAD 
+         master content 2 -----> 현재 브랜치에서 수정한 내용
+         =======
+         o2 content 2 ---------> 병합할 브랜치에서 수정한 내용
+         >>>>>>> o2
+         # title
+         content
+         양쪽 브랜치의 내용을 참고하면서 직접 내용을 수정해야 한다.
+
+         # title
+         content
+         o2 content 2
+         # title
+         content
+   12.git commit -am 'merge o2 branch'
+         이제 수정한 work.txt를 커밋하면 됨
+         이렇게 해서 o2 브랜치에서 병합한 work.txt의 충돌을 해결하고 병합
+   13.git log --oneline --branches --graph
+         *   ebb812c (HEAD -> master) merge o2 branch
+         |\
+         | * effb0be (o2) o2 work 2
+         * | c6d4d47 master work 2
+         |/
+         * dcccb13 work 1
+
+      참고| 병합 및 충돌 해결 프로그램
+         프로젝트 규모가 클수록 브랜치가 많아 병합해야 할 일도 많다. 그만큼 충돌이 
+         많이 발생, 그래서 깃의 블랜치 병합을 자동으로 처리해 주고 충돌을 해결해 주는
+         프로그램이 많다. 다음은 자주 사용하는 병합 자동화 프로그램이다.
+         P4Merge        무료/단축키 지원안됨
+         Meld           무료/오픈소스
+         Kdiff3         무료/한글깨짐
+         Araxis Merge   유료
+
+병합이 끝난 브랜치 삭제하기
+   브랜치를 병합한 후 더 이상 사용하지 않는 브랜치는 깃에서 삭제 가능
+   1. git branch
+   2. git checkout master
+   3. git branch -d o2
+         브랜치를 삭제할 때는 -d 옵션
+      git branch
+   4. 삭제한 브랜치는 같은 이름으로 다시 브랜치를 만들면 예전에 작업했던
+      내용이 그대로 표시 즉, 브랜치를 삭제한다는 것은 완전히 저장소에서
+      없애는 것이 아니라 깃의 흐름 속에서 감추는 것
+
+
+
+         
+
+
+
+    

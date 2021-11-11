@@ -1,0 +1,130 @@
+
+스테이지에 올렸던 파일을 내리거나
+커밋을 취소하는 등 각 단계로 돌아가는 방법
+
+작업 트리에서 수정한 파일 되돌리기(git checkout)
+    파일을 수정한 뒤 소스가 정상적으로 동작하지 않는 등의
+    이유로 수정한 내용을 취소하고 가장 최신 버전 상태로 되돌려야 할 경우
+    1. vi hello.txt
+        '3'을 'three'로 수정
+    2. git status
+        Changes not staged for commit:
+            (use "git add <file>..." to update what will be committed)
+            (use "git restore <file>..." to discard changes in working directory)
+       hello.txt가 수정되었지만 아직 스테이지에 올라가 있지 않은 상태
+       작업트리의 변경사항을 취소하려면 restore(복원) 사용
+    3. git checkout -- hello.txt
+    4. cat 명령을 통해 확인
+         cat hello.txt
+
+스테이징 되돌리기(git reset HEAD 파일이름)
+    앞에서는 파일의 수정을 취소하고 원래대로 되돌림
+    이번에는 수정된 파일을 스테이징했을 때, 스테이징을 취소하는 방법
+    1. vi hello2.txt
+        기존내용 삭제 후 'A, B, C, D' 로 수정
+    2. git add hello2.txt
+       git status
+    3. Changes to be committed:
+        (use "git restore --staged <file>..." to unstage)
+    4. git restore --staged hello2.txt
+        스테이지에서 hello2.txt를 내린다.
+    5. git status
+        Changes not staged for commit:
+        파일이 올라가기 전(not staged)으로 돌아 온 상태
+
+최신 커밋 되돌리기(git reset HEAD^)
+    이번에는 수정된 파일을 스테이징하고 커밋까지 했을 때, 
+    가장 마지막에 한 커밋을 취소하는 방법
+    1. vi hello2.txt
+        'E' 추가 후 저장
+    2. git commit -am "message4"
+        스테이징과 커밋 한 번에 실행
+    3. git log
+    4. git reset HEAD^
+        최신 커밋을 되돌리려면 git reset 명령 다음에 HEAD^
+        HEAD^는 현재 HEAD가 가리키는 브랜치의 최신 커밋을 가리킴
+        이렇게 되돌리면 커밋도 취소되고 스테이지에서도 내려짐
+    5. git log
+
+    참고 | git reset 명령어 옵션
+    --soft HEAD^ 최근 커밋을 하기 전 상태로 작업 트리를 되돌림
+    --hard HEAD^ 최근 커밋, 스테이징, 파일 수정을 하기 전 상태로
+                작업트리를 되돌림. 이 옵션으로 되돌린 내용은 복구 불능
+
+특정 커밋으로 되돌리기(git reset 커밋해시)
+    깃에는 파일을 수정하고 커밋할 때마다 저장된 버전들이 쌓여있다.
+    특정 버전으로 되돌린 다음 그 이후 버전을 삭제도 가능
+    특정 커밋으로 되돌릴 때는 git reset 명령 다음에 커밋해시 사용
+    1. vi rev.txt
+        'a' 입력 후 저장
+    2. git add rev.txt
+       git commit -m 'R1'
+    3. vi rev.txt
+        'b' 추가 후 저장
+       git commit -a -m 'R2'
+    4. vi rev.txt
+        'c' 추가 후 저장
+       git commit -am 'R3'
+    5. vi rev.txt
+        'd' 추가 후 저장
+       git commit -am 'R4'
+    6. git log
+        4개의 커밋이 있고 각 커밋마다 해시가 표시
+        R2라는 메시지가 있는 커밋으로 되돌리기
+        즉, R2 메시지 버전의 커밋을 최신 커밋으로 만들기
+    7. git reset --hard c0bff823c9645bb71e6dd442b127de640f7be13b
+        HEAD is now at c0bff82 R2
+    8. git log
+        commit c0bff823c9645bb71e6dd442b127de640f7be13b (HEAD -> master)
+        Author: jyk <call1212@nate.com>
+        Date:   Thu Nov 4 17:38:13 2021 +0900
+
+            R2
+
+        이렇게 R4 커밋과 R3 커밋이 사라지고, R2 메시지가 있는 두 번째 
+        커밋이 최신 커밋이 됨
+
+커밋 삭제하지 않고 되돌리기(git revert)
+    커밋으로 되돌릴 때 수정했던 것을 삭제해도 된다면 git reset 명령 사용
+    나중에 사용할 것을 대비 취소한 커밋을 남겨 두어야 할 때
+    이 때는 git revert 명령 사용
+    1. vi rev.txt
+        'e' 추가 후 저장
+    2. git commit -am 'R5'
+    3. git log
+        가장 최근에 커밋한 R5 버전을 취소하고, R5 직전 커밋 R2로 되돌리기
+        : revert + '취소하려고 하는 버전, 즉 R5의 커밋 해시를 지정'
+    4. git revert eaad8dcd313ab66af57c1de05637fe1cd2da32f6
+        revert 명령을 실행할 때는 깃을 설치할 때 지정했던 기본 편집기가 
+        자동으로 실행 커밋 메시지를 입력
+    5. git log
+        commit ff93e4d7723f64629cb4a9350f03f0c8d8264676 (HEAD -> master)
+        Author: jyk <call1212@nate.com>
+        Date:   Thu Nov 4 17:59:24 2021 +0900
+
+            Revert "R5"
+
+            <EC><9D><BC><EC><8B><9C><EC><A0><81><EC><9C><BC><EB><A1><9C> <EC><BB><A4><EB><B0><8B> <EB><B3><B4><EB>
+        <A5><98><ED><95><A8>.....
+
+            This reverts commit eaad8dcd313ab66af57c1de05637fe1cd2da32f6.
+
+        commit eaad8dcd313ab66af57c1de05637fe1cd2da32f6
+        Author: jyk <call1212@nate.com>
+        Date:   Thu Nov 4 17:58:05 2021 +0900
+
+            R5
+        .
+        .
+        .
+
+        로그에 R5를 revert한 새로운 커밋이 생성. 그리고 기존의 R5 역시 사라지지 않음
+        R5버전을 지우는 대신 R5에서 변경했던 이력을 취소한 새 커밋을 만듦
+    6. cat rev.txt
+        'e'추가 했던것이 사라짐
+         이렇게 revert 명령을 사용하면 버전에 있던 이력을 취소     
+
+
+
+
+            

@@ -1,0 +1,117 @@
+
+브랜치에서 checkout과 reset의 작동 원리
+    먼저 HEAD와 브랜치의 개념
+    1. git init test
+       cd test
+
+    2. vi c1.txt <-- '1'입력 저장
+       git add c1.txt
+       git commit -m 'c1'
+
+    3. git log
+        (HEAD->master)표시:
+        여기에서 HEAD는 현재 작업트리(워킹디렉터리)가 어떤 버전을 기반으로
+        작업 중인지를 가리키는 포인터이다. 그리고 브랜치는 기본적으로 브랜치에
+        담긴 커밋 중에서 가장 최근의 커밋을 가리킨다.
+
+    4. git branch sub
+        sub브랜치 또한 c1 커밋을 가리킴
+
+    5. vi c2.txt <-- '2' 입력 저장
+       git add c2.txt
+       git commit -m 'c2'
+       이제 master는 c2커밋을 가리키고 HEAD는 그대로 master 브랜치를 가리킴
+
+    6. git checkout sub
+        브랜치 이동을 위한 checkout 명령은 HEAD가 가리키는 것을 제어
+        HEAD가 sub브랜치를 가리킴
+
+    7. vi s1.txt <-- 's1' 입력 저장
+       git add s1.txt
+       git commit -m 's1'
+       이제 HEAD는 sub브랜치를 가리키고 sub는 s1 커밋을 가리킴
+
+    8. 브랜치가 여러 개 일때 reset 명령은 어떻게 사용? 
+       앞에서는 reset명령으로 master브랜치에 있던 여러 커밋 중 하나를 골라서 
+       되돌아감. 브랜치가 여러개일 때는 현재 브랜치가 아닌 다른 브랜치에 있는
+       커밋을 골라서 최신 커밋으로 지정할 수 있다.
+       예를 들어 sub브랜치에 있는 상태에서 master브랜치에 있는 c2 커밋을 
+       sub브랜치의 최신 커밋으로 지정할 수 있다.
+       먼저 해시확인..
+       git log --oneline --branches
+        ce7d26c (HEAD -> sub) s1
+        f3ef1d1 (master) c2
+        6c10d32 c1
+
+    9. git reset f3ef1d1  
+        c2 커밋의 해시를 입력
+    10.git log --oneline --branches --graph
+        * f3ef1d1 (HEAD -> sub, master) c2
+        * 6c10d32 c1
+        sub브랜치의 최신 커밋이 master브랜치의 최신 커밋인 c2로 바뀜
+        이렇게 git reset 명령을 사용하면 현재 브랜치가 가리키는 커밋을
+        여러 브랜치 사이를 넘나들면서 제어할 수 있다.
+        이제 sub브랜치는 c2커밋을 가리키고 있기 때문에 원래 가리키고 있던
+        s1 커밋은 연결이 끊기면서 삭제 된다.
+
+
+    git checkout 명령을 사용하면 HEAD를 제어해서 브랜치를 이동할 수 있다.
+    git reset 명령을 사용하면 HEAD가 가리키고 있는 브랜치의 최신 커밋을
+    원하는 커밋으로 지정할 수 있다. 이때 어떤 브랜치에 있는 커밋이든 지정할
+    수 있으며, 명령을 수행한 뒤 브랜치와 연결이 끊긴 커밋은 삭제 된다.
+
+수정 중인 파일 감추기 및 되돌리기(git stash)
+    stash : 따로 떼어 감춰, 간수한다.            
+    브랜치에서 파일을 수정하고 커밋하지 않은 상태에서 급하게 다른 파일을 
+    커밋해야 할 경우 아직 커밋하지 않은 파일들을 그냥 두어도 상관없지만
+    계속 커밋하라는 메시지가 나타나 번거로움
+    실수로 다른 파일과 함께 커밋이 될 수도... 이럴때 아직 커밋하지 않고
+    작업 중인 파일들을 잠시 감춰둘 수 있다. 그리고 당장 필요한 작업들을
+    끝낸 후 다시 감춰둔 파일들을 꺼내오면 됨
+    1. git init st
+       cd st
+    2. vi f1.txt
+       git add f1.txt
+       git commit -m 'f1'
+       git stash 명령을 사용하려면 파일이 tracked 상태여야 한다. 즉 한 번은
+       커밋한 상태여야 함.
+    3. vi f2.txt
+       git add f2.txt
+       git commit -m 'f2'
+    4. vi f1.txt 수정
+       vi f2.txt 수정
+
+    5. git status
+        Changes not staged for commit:
+            modified:   f1.txt
+            modified:   f2.txt
+    6. git stash
+        Saved working directory and index state WIP on master: fb55dfc f2
+        이제 f1.txt 파일과 f2.txt 파일을 커밋하기 전에 다른 파일을 수정해야
+        한다고 가정하자. 커밋하지 않은 수정 내용을 어딘가에 보관하려면
+        git stash 명령을 사용한다. 
+    7. git status
+        nothing to commit, working tree clean
+        조금 전에 표시되었던 modified 메시지가 사라짐
+
+    8. git stash list
+        stash@{0}: WIP on master: fb55dfc f2
+        같은 방법으로 여러 파일을 수정한 후 따로 보관 가능, 이렇게 감춘 파일들은
+        stash목록에서 확인. 가장 먼저 감춘 것은 stash@{0}에 들어있는데, 앞으로
+        다른 파일이 추가되면 기존 파일은 stash@{1}로 옮겨지고 새로 추가된 파일은
+        stash@{0}에 담긴다. 즉 가장 최근에 보관한 것이 stash@{0}에 담긴다. 스택(stack)
+        
+    9. git stash pop
+        Changes not staged for commit:
+            modified:   f1.txt
+            modified:   f2.txt
+        급한 작업을 모두 마쳤다면 감춰둔 파일을 꺼내와 계속 수정하거나 커밋
+        stash pop 명령은 stash 목록에서 가장 최근 항목을 되돌린다. 여기에서는
+        f1.txt 와 f2.txt가 수정된 상태로 되돌아간다.
+        
+
+
+
+
+
+

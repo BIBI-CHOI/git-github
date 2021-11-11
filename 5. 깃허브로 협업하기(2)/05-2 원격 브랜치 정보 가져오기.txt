@@ -1,0 +1,126 @@
+git pull 명령은 원격 저장소의 최신 커밋을 지역 저장소에 합쳐준다.
+하지만 최신 커밋을 합치기 전에 원격 저장소에 어떤 변화가 있는지 먼저 살펴보자.
+이 절에서는 원격 브랜치의 역할과 원격 브랜치에서 정보를 가져오는 방법,
+가져온 정보를 지역 저장소에 병합하는 과정을 알아보자.
+
+원격 master 브랜치
+    지역 저장소의 master 브랜치처럼 원격 저장소도 만들 때 기본으로 master
+    브랜치가 생성된다. 앞에서 git_home 저장소와 git_office 저장소로 원격
+    저장소를 복제한 상태로 실습을 계속하면서 확인해 보자. 이제부터 원격 저장소
+    에 있는 브랜치는 '원격 브랜치'로, 원격 저장소에 있는 master 브랜치는 
+    '원격 master 브랜치'로 구별해서 명명한다.
+    1. 깃허브에서 test-1 저장소로 접속한 후 [commits]를 클릭 
+       'add d'라는 커밋이 마지막, 여기에서 원격 저장소에 있는 HEAD는 원격
+       저장소의 master 브랜치를 가리킬 것이고, 원격 master 브랜치는 'add d'
+       라는 최종 커밋을 가리킨다.
+    2. cd git_home
+       git log --oneline
+        fc26b88 (HEAD -> master, origin/master, origin/HEAD) add d
+        여기에서 HEAD->master는 이 커밋이 지역 저장소의 최종 커밋이라는 뜻,
+        origin/master는 원격 저장소의 최종 커밋이라는 뜻이다.
+        아직 git_home 디렉터리가 원격 저장소를 복제한 상태 그래로이기 때문에
+        지역 저장소와 원격 저장소 모두의 최종 커밋이 같다.
+    3. git_home 디렉터리에 새로운 커밋을 만들어 보자.
+       vi f3.txt <- 'a' 입력 저장
+    4. git add f3.txt
+       git commit -m 'create f3.txt'
+    5. git log --oneline
+        1c0cf41 (HEAD -> master) create f3.txt
+        fc26b88 (origin/master, origin/HEAD) add d
+        7590dc2 add c
+        b5bf78c Create f2.txt
+        fbeb28b add b
+        6c1f1b9 add a
+
+        (HEAD->master)는 방금 커밋한 'create f3.txt'를 가리킨다. 지역 저장소의
+        최종 커밋이 'create f3.txt'커밋이라는 뜻, 
+        하지만 (origin/master, origin/HEAD)는 아직 'add d' 커밋을 가리키고 있다.
+    6. git status
+        Your branch is ahead of 'origin/master' by 1 commit.
+          (use "git push" to publish your local commits)
+        이 상태에서 git status를 입력해 보면 현재 master 브랜치가 origin에 있는 
+        원격 master 브랜치의 버전보다 하나 앞서 있는 것을 알 수 있다. 그리고
+        push 명령으로 지역 저장소의 커밋을 원격 저장소로 올리라고 알려준다.
+    7. git push
+       git log --oneline
+        이제 git push 명령을 사용해서 'create f3.txt'라는 커밋을 원격 저장소로 올리자
+        그러고나서 커밋 로그를 확인하면 푸시하기 전까지는 master 브랜치와 origin/master
+        브랜치가 가리키는 커밋이 달랐지만, 푸시한 후에는 master와 origin/master 브랜치가
+        같은 커밋을 가리키게 됩니다.
+
+        1c0cf41 (HEAD -> master, origin/master, origin/HEAD) create f3.txt
+        fc26b88 add d
+        7590dc2 add c
+        b5bf78c Create f2.txt
+        fbeb28b add b
+        6c1f1b9 add a
+
+원격 브랜치 정보 가져오기(git fetch)
+    패치(fetch)는 '불러오다, 가져오다'라는 뜻, 그래서 git fetch 명령은 원격 저장소의 
+    정보를 가져오는 기능이 있다. 풀 명령이 원격 저장소의 커밋을 가져와서 무조건 지역
+    저장소와 합친다면, 패치 명령은 원격 브랜치에 어떤 변화가 있는지 그 정보만 가져온다.
+    팀 작업을 할 때 다른 사람이 수정한 소스를 한번 더 훑어보고 지역 저장소와 합치고
+    싶다면 풀 대신 패치를 사용해서 커밋을 가져온 다음 지역 저장소와 합치면 된다.
+    1. cd ../git_office
+       git fetch
+        remote: Enumerating objects: 4, done.
+        remote: Counting objects: 100% (4/4), done.
+        remote: Compressing objects: 100% (2/2), done.
+        remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0
+        Unpacking objects: 100% (3/3), 272 bytes | 13.00 KiB/s, done.
+        From https://github.com/narospace/test-1
+        fc26b88..1c0cf41  master     -> origin/master
+
+        회사 컴퓨터 저장소로 이동해서 진행. 원격 저장소에서 무언가 가져옴
+    2. ls -al 
+        분명히 원격 저장소에 있는 커밋을 가져왔는데 git_home에서 원격 저장소로 푸시했던
+        f3.txt 파일이 없네?
+    3. git log --oneline
+        fc26b88 (HEAD -> master) add d
+        7590dc2 add c
+        b5bf78c Create f2.txt
+        fbeb28b add b
+        6c1f1b9 add a
+        커밋 해시 오른쪽을 보면 (HEAD -> master)만 보이고 원격 저장소의 (origin/master)
+        는 보이지 않는다. 원격 저장소의 최신 커밋 정보를 가져왔지만 아직 지역 저장소에 
+        합치지 않아 원래 git_office에 있던 최신 커밋만 나타나기 때문이다.
+    4. git status
+        Your branch is behind 'origin/master' by 1 commit, and can be fast-forwarded.
+            (use "git pull" to update your local branch)
+        현재 브랜치가 origin/master에 비해 1개 커밋이 뒤처져 있다고 표시
+        즉 원격 저장소의 최신 커밋 하나가 아직 지역 저장소에 반영되지 않았다는 뜻
+        git pull 명령 사용하여 업데이트 하라고 알려줌
+    5. 그렇다면 패치로 가져온 최신 커밋 정보는 어디에 있을까? 
+       패치로 가져온 원격 저장소 정보는 origin/master 브랜치가 아닌 FETCH_HEAD라는 브랜치로
+       가져옴. 이 브랜치로 가져온 정보는 지역 저장소에 바로 반영되지 않는다.
+    6. git checkout FETCH_HEAD
+        패치해서 가저온 최신 커밋을 살펴보고 싶다면 FETCH_HEAD 브랜치로 체크아웃
+        ...
+        HEAD is now at 1c0cf41 create f3.txt
+        happycom@HAPPY-COM MINGW64 /e/Lecture/01.강의자료/SRC/Git/git_office ((1c0cf41...))
+    7. git log
+        commit 1c0cf41623eaec15b0e4501be1e8b757d61534cb (HEAD, origin/master, origin/HEAD)
+        Author: happyhome <call1212@narospace.com>
+        Date:   Sat Nov 6 21:39:36 2021 +0900
+
+            create f3.txt
+            ...
+        
+        FETCH_HEAD 브랜치에서 git log 명령 실행 (HEAD, origin/master, origin/HEAD)가 표시
+        즉 이 커밋이 패치로 가져온 원격 브랜치의 최신 커밋이다. 이 내용을 살펴보고 원격 브랜치
+        의 최신 커밋을 지역 저장소에 합칠지 말지를 결정하면 된다.
+
+        happycom@HAPPY-COM MINGW64 /e/Lecture/01.강의자료/SRC/Git/git_office ((1c0cf41...))
+        $ ls -al
+        ...
+        -rw-r--r-- 1 happycom 197121  3 Nov  7 00:19 f3.txt
+        f3.txt 파일 확인
+
+    8. git checkout master
+       git merge FETCH_HEAD
+
+        패치한 후에 최신 커밋을 현재 브랜치에 합치려면 git pull 명령을 사용해서 원격 저장소의
+        소스를 내려받을 수도 있고, git merge 명령으로 FETCH_HEAD에 있던 커밋을 병합할 수도
+        있다.
+    9. git log --oneline
+       ls -al

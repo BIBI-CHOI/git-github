@@ -1,0 +1,43 @@
+
+커밋 기록 자세히 살펴보기(git log)
+    $ git log
+
+    1. 커밋해시 : 커밋 식별 아이디
+        commit 4388ff66667a3b9f15b53fb62b67744a1bb74b67 
+    2. 최신버전 :  이 버전이 가장 최신이라는 표시   
+        (HEAD -> master)
+    3. 작성자 : 누가
+        Author: jyk <call1212@nate.com>
+    4. 버전 만든 날짜 : 언제
+        Date:   Thu Nov 4 13:49:26 2021 +0900
+    5. 커밋 메시지 : 작성자의 메시지 기록
+        message2
+
+변경 사항 확인하기(git diff)
+    어디가 어떻게 수정되었는지 파악
+    1. vi hello.txt 
+        '2' 삭제 후 'two' 수정
+    2. git status
+        Changes not staged for commit:
+        modified:   hello.txt
+        파일이 수정되었고 아직 스테이징 상태가 아님
+    3. git diff
+        수정한 hello.txt 파일이 저장소에 있는 
+        최신 버전의 hello.txt와 어떻게 다른지 확인
+         1 
+        -2      최신버전과 비교할 때 '2'가 삭제
+        +two    'two'라는 내용이 추가
+
+        이렇게 작업트리에서 수정한 파일과 최신 버전을 비교한 다음,
+        수정한 내용으로 다시 버전을 만들려면 스테이징에 올린 후 커밋하고 
+        수정한 내용을 버리려면 git checkout 명령을 사용해 수정 내용을 취소
+
+    4. 실습을 위해 hello.txt 원래대로 되돌리기
+        vi hello.txt
+        'two' -> '2' 수정
+
+    5. git status   
+    6. git diff
+     
+
+    

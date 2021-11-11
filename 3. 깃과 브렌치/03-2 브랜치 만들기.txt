@@ -1,0 +1,93 @@
+
+실습 상황 설정하기
+    1. mkdir manual
+       cd manual
+    2. git init
+       ls -al
+    3. vi work.txt
+        'content 1' 입력 후 저장
+    4. git add work.txt
+       git commit  -m 'work 1'
+    5. git log
+    6. vi work.txt <--'content 2' 추가
+       git commit -am 'work 2'
+    7. vi work.txt <--'content 3' 추가
+       git commit -am 'work 3'
+    8. git log
+    여기까지가 초기 사용 설명서를 만드는 작업
+    
+    이제부터 여러 고객사에게 서로 다른 내용의 
+    사용설명서를 제공해야 하는 상황이다.
+
+    브랜치를 사용하지 않는다면 각 고객사 디렉터리를 만들고
+    manual 디렉터리를 복사해서 사용, 곧 문제가 발생
+
+새 브랜치 만들기
+    이제부터 직접 브랜치를 만들면서 우아한 방법으로 어떻게 처리
+    하는지 알아보자. 여기서는 apple, google, ms 고객사 참여
+    1. git branch
+        깃에서 브랜치를 만들거나 확인하는 명령
+        * master
+        master는 특별한 브랜치
+        저장소를 만들 때 기본적으로 master 브랜치가 만들어짐
+        우리는 그동안 master브랜치에서 작업했던거임
+    2. git branch apple
+        새로운 브랜치를 만드는 명령
+    3. git branch
+          apple
+        * master
+        '*'표시는 아직 우리가 master브랜치에서 작업하고 있다는 뜻
+    4. git log
+        commit 3d0b8b91dc84d7a18c13.... (HEAD -> master, apple)
+        Author: jyk <call1212@nate.com>
+        Date:   Thu Nov 4 19:15:48 2021 +0900
+
+            work 3
+
+        apple 브랜치가 추가되어 바뀜(HEAD -> master, apple)
+        이 표시는 저장소에 2개의 브랜치가 있고 HEAD-> master이므로 
+        현재 작업 중인 브랜치는 master 브랜치라는 의미
+    5. git branch google
+       git branch ms
+       git branch
+
+브랜치 사이 이동하기(git checkout)
+    브랜치를 여러 개 만들었으면 각 브랜치를 오가면서 작업할 수 있어야...
+    1. git log
+        commit 3d0b8b91dc84... (HEAD -> master, ms, google, apple)
+             work 3
+        이것은 master브랜치 뿐만 아니라 ms, google, apple브랜치가
+        work3 커밋 상태에서 만들어졌음을 의미 즉, 각 브랜치들의 최신
+        커밋이 'work3'라는 뜻
+    2. vi work.txt <-- 'master content 4' 추가 후 저장
+       git commit -am 'master content 4'
+    3. git log --oneline
+        --oneline옵션은 한 줄에 한 커밋씩 표시
+        057a8f3 (HEAD -> master) master content 4
+        3d0b8b9 (ms, google, apple) work 3
+        4a5e2f9 work 2
+        efdc4ae work 1
+        최신 커밋인'master content 4'는 master브랜치에만 적용
+        ms, google, apple브랜치는 아직 'work3' 커밋 상태
+    4. git checkout apple
+        현재 브랜치(master)에서 다른 브랜치로 이동하면 어떻게 변하는지...
+        브랜치 이동 checkout 명령 + 이름 사용 'apple 브랜치로 체크아웃 한다'
+        happycom@happyCom/SRC/Git/manual (master)                                                       
+        happycom@happyCom/SRC/Git/manual (apple)
+        $
+        master에서 apple로 변경: 현재브랜치가 apple 이라는 뜻
+    5. git log --oneline
+        3d0b8b9 (HEAD -> apple, ms, google) work 3
+        4a5e2f9 work 2
+        efdc4ae work 1
+        최신 커밋 해시에서 HEAD가 apple을 가리킴
+    6. cat work.txt
+        content 1
+        content 2
+        content 3
+        최신 커밋이 work3 이기 때문에 세 개의 행만 존재
+        master브랜치에서 분기 이후에 master브랜치에 추가된 커밋은 
+        apple 브랜치 즉, 분기된 브랜치에 영향을 미치지 않았음
+
+
+        

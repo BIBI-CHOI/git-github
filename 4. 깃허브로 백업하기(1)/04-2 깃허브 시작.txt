@@ -1,0 +1,29 @@
+04-2 깃허브 시작하기
+깃허브에 원격 저장소를 만들기 위해서는 먼저 깃허브에 가입
+
+깃허브에 가입하기
+    1. www.github.com에 접속 후 [Sign up] 클릭
+        깃허브 계정이 있다면 [Sign in] 로그인
+    2. 가입 항목 중 필수 입력 사항 모두 입력
+       화면 아래쪽의 'Verify account'에 있는 문제 풀고
+       [Create an account] 클릭
+    3. 유/무료 계정 선택 'Free' [Continue] 클릭
+       무료계정의 경우 3명 까지 협업 가능
+    4. 설문 답을 한 후 [Submit] 또는 [skip this step]
+    5. 가입 시 입력한 메일 주소로 인증메일 확인 [Verify email address]
+
+깃허브에 원격 저장소 만들기
+    이제부터 원격 저장소를 어떻게 만드는지 살펴보자.
+    1. 깃허브에 로그인한 후 화면 상단 오른쪽 [+]를 누르고   
+       [New repository]를 선택
+    2. 저장소 이름을 비롯해서 필요한 항목을 기입[Create repository]
+    3. 저장소를 만들었다면 화면에 나타난 HTTPS 주소를 사용해 언제든지
+       깃허브 저장소에 접속, 파일을 올릴 수도 있다. 즉 저장소 주소만 알고
+       있다면 어디에서든 지역 저장소를 백업하거나 다른 사람과 협업 가능하다.
+
+       HTTPS로 접속하는 주소는 다음고 같은 형태이다.
+       https://github.com/아이디/저장소이름
+
+       예) HTTPS|SSH https://github.com/narospace/test-1.git
+
+       

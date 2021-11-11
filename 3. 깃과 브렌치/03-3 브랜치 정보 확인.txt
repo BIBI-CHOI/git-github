@@ -1,0 +1,56 @@
+
+여기서는 여러 브랜치에서 각각 커밋이 이루어질 때 커밋끼리 어떤 관계를
+하고 있는지 확인하는 방법과 브랜치 사이의 차이점을 확인하는 방법 공부
+
+새 브랜치에서 커밋하기
+    apple 브랜치에 새로운 커밋
+    1. vi work.txt  <-- 'apple content 4' 입력 저장
+    2. vi apple.txt <-- 'apple content 4' 입력 저장
+     실제 업무에서 apple 고객사만을 위한 내용이 담긴 파일
+    3. git add .
+       git commit -m 'apple content 4'  
+    4. 윈도우 창으로 해당 경로(E:\Lecture\01.강의자료\SRC\Git\manual)의
+       폴더를 보면 각 브랜치로 ceckout 할 때마다 파일이 변경된다.
+       master브랜치는 apple.txt 파일이 존재하지 않음
+    5. git log --oneline
+        f0848a5 (HEAD -> apple) apple content 4
+        3d0b8b9 (ms, google) work 3
+        4a5e2f9 work 2
+        efdc4ae work 1
+        현재 apple브랜치에 체크아웃한 상태, apple브랜치의 최신 커밋은
+        'apple content 4'이다.
+    6. git log --oneline --branches
+        각 브랜치의 커밋이 함께 표시
+        f0848a5 (HEAD -> apple) apple content 4
+        057a8f3 (master) master content 4
+        3d0b8b9 (ms, google) work 3
+        4a5e2f9 work 2
+        efdc4ae work 1
+    7. git log --oneline --branches --graph
+        * f0848a5 (HEAD -> apple) apple content 4
+        | * 057a8f3 (master) master content 4
+        |/
+        * 3d0b8b9 (ms, google) work 3
+        * 4a5e2f9 work 2
+        * efdc4ae work 1
+        부모 커밋을 찾아보면 'work 3'커밋 
+        그 이후에 분기
+
+브랜치 사이의 차이점 알아보기
+    브랜치마다 커밋이 점점 쌓여갈수록 브랜치 사이에 어떤 차이가 있는지
+    일일이 확인하기 어렵다. 이럴 때 브랜치 이름 사이에 마침표 두 개(..)
+    를 넣는 명령으로 차이점을 쉽게 확인 가능
+    
+    $ git log master..apple
+
+    마침표 왼쪽에 있는 브랜치를 기준으로 오른쪽 브랜치와 비교
+    이렇게 하면 master브랜치에는 없고 apple브랜치에는 있는 커밋,
+    즉, 'apple content 4' 커밋을 표시
+    반대로 apple 브랜치를 기준 master브랜치와 비교하면
+    'master content 4' 커밋을 보여준다.
+
+    $ git log apple..master
+
+    
+
+
